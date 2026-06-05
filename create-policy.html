@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endpoint Central – Create Deployment Policy</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+      color: #333;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── Top nav (same as list page) ── */
+    .topnav {
+      display: flex; align-items: center;
+      background: #fff; border-bottom: 1px solid #dde1e7;
+      height: 46px; padding: 0 14px; gap: 0; flex-shrink: 0; z-index: 100;
+    }
+    .topnav .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; color:#1a1a2e; margin-right:18px; white-space:nowrap; }
+    .logo-icon { width:32px; height:32px; background:conic-gradient(#e55,#f80,#ff0,#0c0,#08f,#80f,#e55); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; font-size:13px; }
+    .topnav-links { display:flex; align-items:stretch; height:100%; gap:2px; }
+    .topnav-links a { display:flex; align-items:center; padding:0 12px; text-decoration:none; color:#444; font-size:12.5px; border-bottom:2px solid transparent; white-space:nowrap; }
+    .topnav-links a:hover { color:#0073e6; }
+    .topnav-links a.active { color:#0073e6; border-bottom-color:#0073e6; font-weight:600; }
+    .topnav-more { padding:0 10px; color:#777; font-size:16px; cursor:pointer; display:flex; align-items:center; }
+    .topnav-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+    .btn-trial { background:linear-gradient(135deg,#ff6b35,#f7931e); color:#fff; border:none; border-radius:4px; padding:6px 13px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .btn-sdp { display:flex; align-items:center; gap:5px; background:#fff; border:1px solid #cdd1d8; border-radius:4px; padding:5px 10px; font-size:12px; font-weight:600; color:#333; cursor:pointer; white-space:nowrap; }
+    .btn-sdp .sdp-dot { width:8px; height:8px; background:#0073e6; border-radius:50%; }
+    .topnav-icon { color:#666; font-size:16px; cursor:pointer; padding:4px; }
+    .avatar { width:28px; height:28px; background:#b0b8c4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; font-weight:700; cursor:pointer; }
+
+    /* ── Page frame ── */
+    .page-frame { display:flex; flex:1; min-height:0; }
+
+    /* ── Breadcrumb + title ── */
+    .breadcrumb { padding:14px 28px 0; font-size:12px; color:#666; display:flex; align-items:center; gap:5px; }
+    .breadcrumb a { color:#0073e6; text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+    .breadcrumb .sep { color:#bbb; }
+
+    .policy-title-row {
+      padding:8px 28px 0;
+      display:flex; align-items:center; gap:8px;
+    }
+    .policy-title {
+      font-size:16px; font-weight:700; color:#1a1a2e;
+    }
+    .title-edit {
+      color:#888; cursor:pointer; font-size:14px;
+      background:none; border:none; padding:2px 4px; border-radius:3px;
+    }
+    .title-edit:hover { color:#0073e6; background:#eaf3ff; }
+
+    /* ── Mode tabs (top level: Autonomous vs Legacy) ── */
+    .mode-tab-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 16px 28px 0;
+    }
+    .mode-tab {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 22px;
+      font-size: 13px; font-weight: 600;
+      border: 1.5px solid #dde1e7;
+      cursor: pointer;
+      background: #fff;
+      color: #666;
+      transition: all .15s;
+      position: relative;
+    }
+    .mode-tab:first-child { border-radius: 6px 0 0 6px; }
+    .mode-tab:last-child  { border-radius: 0 6px 6px 0; border-left: none; }
+    .mode-tab.active {
+      background: #0073e6; color: #fff; border-color: #0073e6; z-index: 1;
+    }
+    .mode-tab .badge-new {
+      background: #34c759; color: #fff; font-size: 9px; font-weight: 700;
+      padding: 1px 6px; border-radius: 10px; letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+    .mode-tab.active .badge-new { background: rgba(255,255,255,.25); color:#fff; }
+    .mode-tab .badge-legacy {
+      background: #f0f2f5; color: #888; font-size: 9px; font-weight: 600;
+      padding: 1px 6px; border-radius: 10px;
+      text-transform: uppercase;
+    }
+    .mode-tab.active .badge-legacy { background: rgba(255,255,255,.2); color:#eee; }
+
+    /* ── Main content wrapper ── */
+    .main-wrap {
+      padding: 18px 28px 40px;
+      flex: 1;
+    }
+
+    /* ════════════════════════════════════
+       AUTONOMOUS DEPLOYMENT PANEL
+    ════════════════════════════════════ */
+    .auto-panel {}
+
+    .auto-intro {
+      background: linear-gradient(135deg, #eaf4ff 0%, #f0f7ff 100%);
+      border: 1px solid #c7dff7;
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .auto-intro-icon {
+      width: 38px; height: 38px; background: #0073e6; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 18px;
+    }
+    .auto-intro h3 { font-size: 14px; font-weight: 700; color: #0051a3; margin-bottom: 4px; }
+    .auto-intro p  { font-size: 12.5px; color: #3d5a7a; line-height: 1.6; }
+
+    /* How it works flow */
+    .how-it-works {
+      background: #fff;
+      border: 1px solid #dde1e7;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+    }
+    .how-it-works h4 {
+      font-size: 12px; font-weight: 700; color: #888;
+      text-transform: uppercase; letter-spacing: .6px;
+      margin-bottom: 18px;
+    }
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .flow-step {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      min-width: 130px;
+    }
+    .flow-icon-wrap {
+      width: 50px; height: 50px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      position: relative;
+    }
+    .flow-icon-wrap.blue   { background: #eaf3ff; }
+    .flow-icon-wrap.purple { background: #f3eeff; }
+    .flow-icon-wrap.amber  { background: #fff8ea; }
+    .flow-icon-wrap.green  { background: #eafaf1; }
+    .flow-step-label { font-size: 12px; font-weight: 600; color: #333; text-align:center; }
+    .flow-step-sub   { font-size: 11px; color: #888; text-align: center; line-height: 1.4; max-width: 110px; }
+    .flow-arrow {
+      flex: 1; height: 2px; background: #dde1e7; min-width: 20px; max-width: 50px;
+      position: relative; margin: 0 4px; margin-bottom: 26px;
+    }
+    .flow-arrow::after {
+      content: ''; position: absolute; right: -1px; top: -4px;
+      border: 5px solid transparent; border-left: 7px solid #dde1e7;
+    }
+
+    /* Patch behavior cards */
+    .patch-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .patch-card {
+      background: #fff;
+      border: 1.5px solid #dde1e7;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .patch-card-header {
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid #eaecf0;
+    }
+    .patch-card-header.non-impact { background: linear-gradient(135deg, #f0fdf4, #e8f9ef); }
+    .patch-card-header.high-impact { background: linear-gradient(135deg, #fffbeb, #fff5d6); }
+    .patch-icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+      flex-shrink: 0;
+    }
+    .patch-icon.green  { background: #d1fae5; }
+    .patch-icon.amber  { background: #fde68a; }
+    .patch-card-header-text h3 { font-size: 13.5px; font-weight: 700; color: #1a1a2e; }
+    .patch-card-header-text p  { font-size: 11.5px; color: #666; margin-top: 2px; }
+    .impact-chip {
+      margin-left: auto; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
+    }
+    .impact-chip.green { background: #d1fae5; color: #065f46; }
+    .impact-chip.amber { background: #fef3c7; color: #92400e; }
+
+    .patch-card-body { padding: 16px 18px; }
+    .patch-feature {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .patch-feature:last-child { margin-bottom: 0; }
+    .feat-icon {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0; margin-top: 1px;
+    }
+    .feat-icon.green { background: #d1fae5; color: #065f46; }
+    .feat-icon.amber { background: #fef3c7; color: #b45309; }
+    .feat-icon.blue  { background: #dbeafe; color: #1d4ed8; }
+    .feat-icon.purple{ background: #ede9fe; color: #6d28d9; }
+    .patch-feature-text { font-size: 12.5px; color: #444; line-height: 1.5; }
+    .patch-feature-text strong { color: #222; }
+
+    /* Notification & settings */
+    .settings-section {
+      background: #fff;
+      border: 1px solid #dde1e7;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+    }
+    .settings-section h4 {
+      font-size: 12px; font-weight: 700; color: #888;
+      text-transform: uppercase; letter-spacing: .6px;
+      margin-bottom: 16px;
+    }
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    .setting-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .setting-label { font-size: 13px; font-weight: 500; color: #333; }
+    .setting-desc  { font-size: 11.5px; color: #888; margin-top: 2px; line-height: 1.4; max-width: 420px; }
+    .setting-control { flex-shrink: 0; display:flex; align-items:center; gap:10px; }
+
+    /* Toggle switch */
+    .toggle-wrap { display:flex; align-items:center; gap:8px; }
+    .toggle {
+      position: relative; width: 38px; height: 20px; cursor: pointer;
+    }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; inset:0; background:#ccc; border-radius:20px; transition:.2s;
+    }
+    .toggle-slider::before {
+      content:''; position:absolute; width:14px; height:14px; background:#fff;
+      border-radius:50%; left:3px; top:3px; transition:.2s;
+    }
+    .toggle input:checked + .toggle-slider { background:#0073e6; }
+    .toggle input:checked + .toggle-slider::before { transform:translateX(18px); }
+    .toggle-label { font-size:12px; color:#555; }
+
+    /* Number/select control */
+    .inline-select {
+      border:1px solid #cdd1d8; border-radius:4px; padding:5px 10px;
+      font-size:12.5px; color:#333; outline:none; background:#fff;
+      min-width:90px;
+    }
+    .inline-select:focus { border-color:#0073e6; }
+    .unit-label { font-size:12.5px; color:#555; }
+
+    /* Postpone options */
+    .radio-group { display:flex; gap:16px; }
+    .radio-option { display:flex; align-items:center; gap:5px; cursor:pointer; font-size:12.5px; color:#444; }
+    .radio-option input[type=radio] { accent-color:#0073e6; }
+
+    /* ── Footer actions ── */
+    .footer-actions {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 28px;
+      background: #fff;
+      border-top: 1px solid #dde1e7;
+      position: sticky; bottom: 0;
+    }
+    .btn-primary {
+      background: #0073e6; color: #fff; border: none; border-radius: 4px;
+      padding: 9px 22px; font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-primary:hover { background: #005bb5; }
+    .btn-secondary {
+      background: #fff; color: #555; border: 1px solid #cdd1d8; border-radius: 4px;
+      padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-secondary:hover { background: #f4f6fa; }
+
+    /* ════════════════════════════════════
+       LEGACY PANEL (wizard steps)
+    ════════════════════════════════════ */
+    .legacy-panel { display:none; }
+    .legacy-layout { display:flex; gap:24px; }
+
+    .wizard-steps {
+      width: 220px; flex-shrink:0;
+      background:#fff; border:1px solid #dde1e7; border-radius:8px;
+      padding:16px 0; height:fit-content;
+    }
+    .wizard-step {
+      display:flex; align-items:center; gap:12px;
+      padding:11px 16px; cursor:pointer; position:relative;
+    }
+    .wizard-step::before {
+      content:''; position:absolute; left:25px; top:38px;
+      width:2px; height:calc(100% - 4px);
+      background:#dde1e7; z-index:0;
+    }
+    .wizard-step:last-child::before { display:none; }
+    .step-num {
+      width:28px; height:28px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:700; z-index:1;
+      border:2px solid #dde1e7; background:#fff; color:#999;
+      transition:all .15s;
+    }
+    .wizard-step.active .step-num { background:#0073e6; border-color:#0073e6; color:#fff; }
+    .wizard-step.done  .step-num { background:#34c759; border-color:#34c759; color:#fff; font-size:13px; }
+    .step-label { font-size:12.5px; color:#666; }
+    .wizard-step.active .step-label { color:#0073e6; font-weight:600; }
+    .wizard-step .step-action {
+      margin-left:auto; width:20px; height:20px; border-radius:50%;
+      background:#0073e6; color:#fff; border:none; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; font-size:16px;
+      font-weight:300; line-height:1; flex-shrink:0;
+    }
+
+    .wizard-content {
+      flex:1; background:#fff; border:1px solid #dde1e7; border-radius:8px; padding:24px;
+    }
+    .wizard-content h3 { font-size:14px; font-weight:700; color:#1a1a2e; margin-bottom:6px; }
+    .wizard-content .step-desc { font-size:12.5px; color:#666; margin-bottom:22px; line-height:1.5; }
+
+    .form-row {
+      display:flex; align-items:flex-start; gap:20px; margin-bottom:20px;
+    }
+    .form-label {
+      width:200px; flex-shrink:0; font-size:12.5px; color:#444; padding-top:8px;
+      display:flex; align-items:flex-start; gap:4px;
+    }
+    .form-label .req { color:#e55; }
+    .form-controls { flex:1; }
+
+    .radio-row { display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:8px; }
+    .radio-item { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px; color:#333; }
+    .radio-item input[type=radio] { accent-color:#0073e6; width:14px; height:14px; }
+    .help-icon {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:16px; height:16px; border-radius:50%; background:#e8eaf0; color:#777;
+      font-size:10px; cursor:help; font-weight:700;
+    }
+
+    .select-pair { display:flex; gap:10px; }
+    .form-select {
+      border:1px solid #cdd1d8; border-radius:4px; padding:8px 10px;
+      font-size:13px; color:#333; outline:none; background:#fff; flex:1;
+    }
+    .form-select:focus { border-color:#0073e6; }
+
+    .time-range { display:flex; align-items:center; gap:10px; }
+    .time-input {
+      border:1px solid #cdd1d8; border-radius:4px; padding:8px 10px;
+      font-size:13px; color:#aaa; outline:none; width:120px;
+    }
+    .time-input:focus { border-color:#0073e6; color:#333; }
+
+    .month-grid {
+      display:grid; grid-template-columns:repeat(6,1fr); gap:4px; margin-top:6px;
+    }
+    .month-btn {
+      padding:8px 0; text-align:center; font-size:12px; font-weight:600;
+      border:none; border-radius:4px; cursor:pointer; transition:all .15s;
+      background:#0073e6; color:#fff;
+    }
+    .month-btn:hover { background:#005bb5; }
+    .month-btn.off { background:#f0f2f5; color:#888; }
+
+    .deselect-link { color:#0073e6; font-size:12px; cursor:pointer; text-decoration:none; margin-bottom:8px; display:inline-block; }
+    .deselect-link:hover { text-decoration:underline; }
+
+    .add-schedule-btn {
+      background:#f4f6fa; border:1px solid #cdd1d8; border-radius:4px;
+      padding:7px 14px; font-size:12px; color:#555; cursor:pointer;
+      transition:all .15s; margin-top:6px;
+    }
+    .add-schedule-btn:hover { background:#eaf3ff; border-color:#0073e6; color:#0073e6; }
+
+    .download-option { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+    .download-option input[type=radio] { accent-color:#0073e6; margin-top:2px; flex-shrink:0; }
+    .download-option label { font-size:13px; color:#333; cursor:pointer; }
+    .download-option .sub-desc { font-size:11.5px; color:#888; margin-top:3px; line-height:1.5; }
+
+    .divider-line { border:none; border-top:1px solid #f0f2f5; margin:18px 0; }
+
+    /* Inline title edit */
+    #policy-name-input {
+      font-size:16px; font-weight:700; color:#1a1a2e;
+      border:none; background:transparent; outline:none;
+      border-bottom: 1.5px solid transparent;
+      padding: 2px 4px; min-width: 160px;
+      transition: border-color .15s;
+    }
+    #policy-name-input:focus { border-bottom-color:#0073e6; background:#f8faff; border-radius:4px 4px 0 0; }
+  </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-icon">e</div>
+    Endpoint Central
+  </div>
+  <div class="topnav-links">
+    <a href="#">Home</a>
+    <a href="#">Configurations</a>
+    <a href="#">Threats &amp; Patches</a>
+    <a href="#" class="active">Software Deployment</a>
+    <a href="#">Inventory</a>
+    <a href="#">Agent</a>
+  </div>
+  <span class="topnav-more">•••</span>
+  <div class="topnav-right">
+    <button class="btn-trial">Start your 30 days free trial</button>
+    <button class="btn-sdp"><span class="sdp-dot"></span> Jump to SDP</button>
+    <span class="topnav-icon">🔍</span>
+    <span class="topnav-icon">🔔</span>
+    <span class="topnav-icon">⚡</span>
+    <div class="avatar">U</div>
+    <span style="font-size:18px;color:#555;cursor:pointer;">⠿</span>
+  </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a href="deployment-policies.html">Deployment</a>
+  <span class="sep">›</span>
+  <a href="deployment-policies.html">Deployment Policies</a>
+  <span class="sep">›</span>
+  <span>Create Deployment Policy</span>
+</div>
+
+<!-- Policy title -->
+<div class="policy-title-row">
+  <input id="policy-name-input" value="My Policy 4107" />
+  <button class="title-edit" title="Rename policy" onclick="document.getElementById('policy-name-input').focus()">✏</button>
+</div>
+
+<!-- Mode tabs -->
+<div class="mode-tab-bar">
+  <div class="mode-tab active" id="tab-auto" onclick="switchMode('auto')">
+    ✦ Autonomous Deployment
+    <span class="badge-new">New</span>
+  </div>
+  <div class="mode-tab" id="tab-legacy" onclick="switchMode('legacy')">
+    Scheduled Deployment
+    <span class="badge-legacy">Classic</span>
+  </div>
+</div>
+
+<!-- ── Main content ── -->
+<div class="main-wrap">
+
+  <!-- ══ AUTONOMOUS PANEL ══ -->
+  <div class="auto-panel" id="panel-auto">
+
+    <!-- Intro banner -->
+    <div class="auto-intro">
+      <div class="auto-intro-icon">✦</div>
+      <div>
+        <h3>Autonomous Deployment — Intelligent, idle-aware patching</h3>
+        <p>
+          The system continuously monitors user activity and automatically handles patch delivery and installation
+          with zero manual scheduling. Non-disruptive patches deploy silently at any time; high-impact patches
+          wait for the user's idle window — protecting productivity while keeping machines fully patched.
+        </p>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="how-it-works">
+      <h4>How it works</h4>
+      <div class="flow">
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap blue">📦</div>
+          <div class="flow-step-label">Staged Download</div>
+          <div class="flow-step-sub">Patches downloaded in the background before idle time</div>
+        </div>
+
+        <div class="flow-arrow"></div>
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap purple">🕐</div>
+          <div class="flow-step-label">Idle Detection</div>
+          <div class="flow-step-sub">System detects sustained user inactivity</div>
+        </div>
+
+        <div class="flow-arrow"></div>
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap amber">🔔</div>
+          <div class="flow-step-label">Prior Notification</div>
+          <div class="flow-step-sub">User notified 5 min before deployment starts</div>
+        </div>
+
+        <div class="flow-arrow"></div>
+
+        <div class="flow-step">
+          <div class="flow-icon-wrap green">⚡</div>
+          <div class="flow-step-label">Silent Install</div>
+          <div class="flow-step-sub">Patches install while the machine is idle</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Patch behavior cards -->
+    <div class="patch-cards">
+
+      <!-- Non-Impact card -->
+      <div class="patch-card">
+        <div class="patch-card-header non-impact">
+          <div class="patch-icon green">🟢</div>
+          <div class="patch-card-header-text">
+            <h3>Non-Impact Patches</h3>
+            <p>Install silently, no user disruption</p>
+          </div>
+          <span class="impact-chip green">Auto-install anytime</span>
+        </div>
+        <div class="patch-card-body">
+          <div class="patch-feature">
+            <div class="feat-icon green">✓</div>
+            <div class="patch-feature-text">
+              <strong>Installs at any time</strong> — does not require the machine to be idle. Deployment proceeds during normal working hours without interrupting the user.
+            </div>
+          </div>
+          <div class="patch-feature">
+            <div class="feat-icon green">✓</div>
+            <div class="patch-feature-text">
+              <strong>No reboot &amp; no app kill</strong> — patches complete without closing applications or disrupting running processes.
+            </div>
+          </div>
+          <div class="patch-feature">
+            <div class="feat-icon blue">↓</div>
+            <div class="patch-feature-text">
+              <strong>Pre-staged downloads</strong> — binaries fetched in the background well ahead of installation so no bandwidth spike disrupts the user.
+            </div>
+          </div>
+          <div class="patch-feature">
+            <div class="feat-icon green">✓</div>
+            <div class="patch-feature-text">
+              <strong>Zero productivity impact</strong> — the user never sees a prompt or slowdown during installation.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- High-Impact card -->
+      <div class="patch-card">
+        <div class="patch-card-header high-impact">
+          <div class="patch-icon amber">⚠️</div>
+          <div class="patch-card-header-text">
+            <h3>High-Impact Patches</h3>
+            <p>Require app kill or immediate reboot</p>
+          </div>
+          <span class="impact-chip amber">Idle-time only</span>
+        </div>
+        <div class="patch-card-body">
+          <div class="patch-feature">
+            <div class="feat-icon amber">⏸</div>
+            <div class="patch-feature-text">
+              <strong>Waits for user idle time</strong> — installation is held back until the system detects the user is inactive, ensuring no running work is interrupted.
+            </div>
+          </div>
+          <div class="patch-feature">
+            <div class="feat-icon amber">⚠️</div>
+            <div class="patch-feature-text">
+              <strong>App kill &amp; reboot handled automatically</strong> — any required application terminations and reboots happen during the idle window, not during work hours.
+            </div>
+          </div>
+          <div class="patch-feature">
+            <div class="feat-icon blue">↓</div>
+            <div class="patch-feature-text">
+              <strong>Pre-staged downloads</strong> — patch binaries are ready before the idle window opens so installation begins immediately, minimising the idle time needed.
+            </div>
+          </div>
+          <div class="patch-feature">
+            <div class="feat-icon purple">🔔</div>
+            <div class="patch-feature-text">
+              <strong>5-minute advance notification</strong> — if the user returns during idle deployment, a notification gives them the option to postpone before any disruptive action begins.
+            </div>
+          </div>
+          <div class="patch-feature">
+            <div class="feat-icon" style="background:#ede9fe;color:#6d28d9;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px;">🤖</div>
+            <div class="patch-feature-text">
+              <strong>AI Agent awareness</strong> — long-running AI processes receive a graceful shutdown signal before any force-kill, preserving context and preventing data loss.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Notification & Idle Settings -->
+    <div class="settings-section">
+      <h4>Notification &amp; Idle Settings</h4>
+
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Pre-deployment notification</div>
+          <div class="setting-desc">A notification toast is shown to the user this many minutes before an idle-time deployment begins, allowing them to postpone if needed.</div>
+        </div>
+        <div class="setting-control">
+          <select class="inline-select">
+            <option>5 minutes</option>
+            <option>10 minutes</option>
+            <option>15 minutes</option>
+            <option>30 minutes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-row" style="flex-direction:column; align-items:stretch; gap:0;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div>
+            <div class="setting-label">Allow user to postpone</div>
+            <div class="setting-desc">When the pre-deployment notification appears, allow the user to defer the installation to the next idle window.</div>
+          </div>
+          <div class="setting-control">
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="postpone" value="yes" checked onchange="toggleForceRow(this)" /> Yes</label>
+              <label class="radio-option"><input type="radio" name="postpone" value="no" onchange="toggleForceRow(this)" /> No — deploy immediately</label>
+            </div>
+          </div>
+        </div>
+        <div id="force-deploy-row" style="
+          display: flex; align-items: center; justify-content: space-between;
+          margin-top: 12px; padding: 12px 14px;
+          background: #f7f9fc; border: 1px solid #e4e8ef; border-radius: 6px;
+          overflow: hidden; transition: opacity .2s, max-height .25s;
+        ">
+          <div>
+            <div class="setting-label" style="font-size:12.5px;">Force deployment after</div>
+            <div class="setting-desc">Even if the user keeps postponing, deployment will be forced once this many days have passed since the patch became available.</div>
+          </div>
+          <div class="setting-control" style="gap:8px; flex-shrink:0;">
+            <input type="number" id="force-days" value="7" min="1" max="90" style="
+              width:64px; border:1px solid #cdd1d8; border-radius:4px;
+              padding:6px 10px; font-size:13px; font-weight:600; color:#333;
+              text-align:center; outline:none;
+            " onfocus="this.style.borderColor='#0073e6'" onblur="this.style.borderColor='#cdd1d8'" />
+            <span class="unit-label">days</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Idle time threshold</div>
+          <div class="setting-desc">Minimum duration of user inactivity before the system is considered idle and eligible for high-impact patch deployment.</div>
+        </div>
+        <div class="setting-control">
+          <select class="inline-select">
+            <option>15 minutes</option>
+            <option selected>30 minutes</option>
+            <option>45 minutes</option>
+            <option>60 minutes</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- App Kill Behavior section -->
+    <div class="settings-section">
+      <h4>App Kill Behavior</h4>
+
+      <!-- Kill mode -->
+      <div class="setting-row" style="flex-direction:column; align-items:stretch; gap:0;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div>
+            <div class="setting-label">Application kill mode</div>
+            <div class="setting-desc">Controls how running applications are handled when a high-impact patch needs to install during idle time.</div>
+          </div>
+          <div class="setting-control">
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="kill-mode" value="graceful" checked onchange="toggleKillMode(this)" /> Graceful <span style="font-size:11px;color:#34c759;font-weight:600;">(Recommended)</span></label>
+              <label class="radio-option"><input type="radio" name="kill-mode" value="immediate" onchange="toggleKillMode(this)" /> Immediate</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graceful sub-row -->
+        <div id="graceful-row" style="
+          margin-top:12px; padding:12px 14px;
+          background:#f7f9fc; border:1px solid #e4e8ef; border-radius:6px;
+        ">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px;">
+            <div>
+              <div class="setting-label" style="font-size:12.5px;">Graceful shutdown window</div>
+              <div class="setting-desc">After signalling an app to close, wait this long for it to exit cleanly before force-killing it.</div>
+            </div>
+            <div class="setting-control" style="gap:8px; flex-shrink:0;">
+              <select class="inline-select">
+                <option>2 minutes</option>
+                <option selected>5 minutes</option>
+                <option>10 minutes</option>
+                <option>15 minutes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Immediate warning sub-row -->
+        <div id="immediate-row" style="
+          display:none; margin-top:12px; padding:12px 14px;
+          background:#fff8f0; border:1px solid #fcd9a8; border-radius:6px;
+        ">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <span style="font-size:16px; flex-shrink:0;">⚠️</span>
+            <div style="font-size:12.5px; color:#92400e; line-height:1.5;">
+              All running applications will be <strong>force-killed without warning</strong> as soon as the idle window opens. Unsaved work in those apps will be lost. Use only when strict compliance deadlines require it.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Agent awareness -->
+      <div class="setting-row" style="flex-direction:column; align-items:stretch; gap:0;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div>
+            <div class="setting-label">AI Agent awareness</div>
+            <div class="setting-desc">Detect known AI agent and long-running autonomous processes. These receive a graceful shutdown signal and an extended grace period before any force-kill, preventing context loss.</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle" title="Toggle AI Agent awareness">
+              <input type="checkbox" id="ai-awareness-toggle" checked onchange="toggleAIAwareness(this)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Process list -->
+        <div id="ai-process-row" style="
+          margin-top:12px; padding:14px 16px;
+          background:#f7f9fc; border:1px solid #e4e8ef; border-radius:6px;
+        ">
+          <div style="font-size:12px; font-weight:600; color:#555; margin-bottom:10px;">
+            Monitored process names
+            <span style="font-weight:400; color:#999; margin-left:6px;">— add any process that should receive graceful shutdown treatment</span>
+          </div>
+          <div id="process-tags" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input id="process-input" type="text" placeholder="e.g. node, agent.exe …" style="
+              border:1px solid #cdd1d8; border-radius:4px; padding:6px 10px;
+              font-size:12.5px; outline:none; width:220px; color:#333;
+            " onfocus="this.style.borderColor='#0073e6'" onblur="this.style.borderColor='#cdd1d8'"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();addProcess();}" />
+            <button onclick="addProcess()" style="
+              border:1px solid #0073e6; border-radius:4px; padding:6px 12px;
+              font-size:12px; font-weight:600; color:#0073e6; background:#fff; cursor:pointer;
+            ">+ Add</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /app kill section -->
+
+  </div><!-- /auto-panel -->
+
+  <!-- ══ LEGACY PANEL ══ -->
+  <div class="legacy-panel" id="panel-legacy">
+    <div class="legacy-layout">
+
+      <!-- Step sidebar -->
+      <div class="wizard-steps">
+        <div class="wizard-step active" onclick="selectStep(1)">
+          <div class="step-num">1</div>
+          <span class="step-label">Deployment Schedule</span>
+        </div>
+        <div class="wizard-step" onclick="selectStep(2)">
+          <div class="step-num">2</div>
+          <span class="step-label">Pre-deployment Activities</span>
+          <button class="step-action">+</button>
+        </div>
+        <div class="wizard-step" onclick="selectStep(3)">
+          <div class="step-num">3</div>
+          <span class="step-label">Pre-deployment user notification</span>
+        </div>
+        <div class="wizard-step" onclick="selectStep(4)">
+          <div class="step-num">4</div>
+          <span class="step-label">Post-deployment Activities</span>
+          <button class="step-action">+</button>
+        </div>
+      </div>
+
+      <!-- Step content -->
+      <div class="wizard-content">
+        <h3>Deployment Schedule</h3>
+        <p class="step-desc">Specify when patches/packages should be deployed to the client machines.</p>
+
+        <!-- Deploy based on -->
+        <div class="form-row">
+          <div class="form-label">Deploy based on</div>
+          <div class="form-controls">
+            <div class="radio-row">
+              <label class="radio-item">
+                <input type="radio" name="deploy-based" checked /> Weeks &amp; Days
+                <span class="help-icon">?</span>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="deploy-based" /> Patch Tuesday (Tue to next Mon)
+                <span class="help-icon">?</span>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="deploy-based" /> Calendar Dates
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider-line" />
+
+        <!-- Weeks & Days -->
+        <div class="form-row">
+          <div class="form-label">Week(s) &amp; Day(s) for deployment <span class="req">*</span></div>
+          <div class="form-controls">
+            <div class="select-pair">
+              <select class="form-select"><option>- Select Weeks -</option><option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option></select>
+              <select class="form-select"><option>- Select Days -</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Time period -->
+        <div class="form-row">
+          <div class="form-label">Deployment Time Period <span class="req">*</span></div>
+          <div class="form-controls">
+            <div class="time-range">
+              <input class="time-input" placeholder="HH:mm" />
+              <span style="color:#888">to</span>
+              <input class="time-input" placeholder="HH:mm" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Months -->
+        <div class="form-row">
+          <div class="form-label">Month(s) for deployment <span class="req">*</span></div>
+          <div class="form-controls">
+            <a class="deselect-link" onclick="toggleMonths()">Deselect All</a>
+            <div class="month-grid" id="month-grid">
+              <button class="month-btn" onclick="toggleMonth(this)">Jan</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Feb</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Mar</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Apr</button>
+              <button class="month-btn" onclick="toggleMonth(this)">May</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Jun</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Jul</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Aug</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Sep</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Oct</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Nov</button>
+              <button class="month-btn" onclick="toggleMonth(this)">Dec</button>
+            </div>
+            <button class="add-schedule-btn">Add more schedules</button>
+          </div>
+        </div>
+
+        <hr class="divider-line" />
+
+        <!-- Download option -->
+        <div class="form-row">
+          <div class="form-label">Download patches from server to agent</div>
+          <div class="form-controls">
+            <div class="download-option">
+              <input type="radio" name="download" id="dl1" checked />
+              <div>
+                <label for="dl1">Any time agent contacts the server (Windows and Linux only)</label>
+                <div class="sub-desc">The agent will not wait for the deployment window to download the patch binaries. The patch binaries will be downloaded in the next agent refresh cycle and the deployment alone is carried out in the deployment window.</div>
+              </div>
+            </div>
+            <div class="download-option" style="margin-top:10px;">
+              <input type="radio" name="download" id="dl2" />
+              <label for="dl2">Only during Deployment Window</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Initiate at -->
+        <div class="form-row">
+          <div class="form-label">Initiate Deployment at</div>
+          <div class="form-controls">
+            <div class="radio-row">
+              <label class="radio-item"><input type="radio" name="initiate" /> System Startup</label>
+              <label class="radio-item"><input type="radio" name="initiate" /> Refresh Cycle</label>
+              <label class="radio-item"><input type="radio" name="initiate" checked /> Either of these whichever happens earlier</label>
+            </div>
+            <div style="font-size:11.5px; color:#888; margin-top:5px; line-height:1.5;">
+              Deployment happens either during the System startup or the Refresh cycle within the Deployment Window as chosen above.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /wizard-content -->
+    </div>
+  </div><!-- /legacy-panel -->
+
+</div><!-- /main-wrap -->
+
+<!-- Footer actions -->
+<div class="footer-actions">
+  <button class="btn-primary" onclick="savePolicy()">Save &amp; Continue</button>
+  <button class="btn-secondary" onclick="window.location.href='deployment-policies.html'">Cancel</button>
+</div>
+
+<script>
+  const DEFAULT_PROCESSES = ['claude', 'ollama', 'python', 'node', 'agent.exe', 'copilot'];
+  let processes = [...DEFAULT_PROCESSES];
+
+  function renderProcessTags() {
+    const container = document.getElementById('process-tags');
+    container.innerHTML = '';
+    processes.forEach((p, i) => {
+      const tag = document.createElement('span');
+      tag.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:#ede9fe;color:#4c1d95;border-radius:20px;padding:3px 10px 3px 12px;font-size:12px;font-weight:500;';
+      tag.innerHTML = `🤖 ${p} <span onclick="removeProcess(${i})" style="cursor:pointer;color:#7c3aed;font-size:14px;line-height:1;margin-left:2px;">×</span>`;
+      container.appendChild(tag);
+    });
+  }
+
+  function addProcess() {
+    const input = document.getElementById('process-input');
+    const val = input.value.trim();
+    if (val && !processes.includes(val)) {
+      processes.push(val);
+      renderProcessTags();
+    }
+    input.value = '';
+    input.focus();
+  }
+
+  function removeProcess(i) {
+    processes.splice(i, 1);
+    renderProcessTags();
+  }
+
+  function toggleKillMode(radio) {
+    const graceful  = document.getElementById('graceful-row');
+    const immediate = document.getElementById('immediate-row');
+    if (radio.value === 'graceful') {
+      graceful.style.display  = '';
+      immediate.style.display = 'none';
+    } else {
+      graceful.style.display  = 'none';
+      immediate.style.display = '';
+    }
+  }
+
+  function toggleAIAwareness(cb) {
+    const row = document.getElementById('ai-process-row');
+    row.style.opacity      = cb.checked ? '1' : '0.4';
+    row.style.pointerEvents = cb.checked ? 'auto' : 'none';
+  }
+
+  function toggleForceRow(radio) {
+    const row = document.getElementById('force-deploy-row');
+    if (radio.value === 'yes') {
+      row.style.opacity = '1';
+      row.style.pointerEvents = 'auto';
+    } else {
+      row.style.opacity = '0.35';
+      row.style.pointerEvents = 'none';
+    }
+  }
+
+  function switchMode(mode) {
+    const isAuto = mode === 'auto';
+    document.getElementById('tab-auto').className   = 'mode-tab' + (isAuto ? ' active' : '');
+    document.getElementById('tab-legacy').className = 'mode-tab' + (!isAuto ? ' active' : '');
+    document.getElementById('panel-auto').style.display   = isAuto ? 'block' : 'none';
+    document.getElementById('panel-legacy').style.display = isAuto ? 'none' : 'block';
+  }
+
+  function selectStep(n) {
+    document.querySelectorAll('.wizard-step').forEach((s, i) => {
+      s.classList.remove('active', 'done');
+      if (i + 1 < n) s.classList.add('done');
+      if (i + 1 === n) s.classList.add('active');
+      const num = s.querySelector('.step-num');
+      if (i + 1 < n) num.textContent = '✓';
+      else num.textContent = i + 1;
+    });
+  }
+
+  let allSelected = true;
+  function toggleMonths() {
+    allSelected = !allSelected;
+    document.querySelectorAll('.month-btn').forEach(b => {
+      b.className = 'month-btn' + (allSelected ? '' : ' off');
+    });
+    document.querySelector('.deselect-link').textContent = allSelected ? 'Deselect All' : 'Select All';
+  }
+  function toggleMonth(btn) {
+    btn.classList.toggle('off');
+  }
+
+  // init
+  renderProcessTags();
+
+  function savePolicy() {
+    const name = document.getElementById('policy-name-input').value.trim();
+    if (!name) { alert('Please enter a policy name.'); return; }
+    window.location.href = 'deployment-policies.html';
+  }
+</script>
+</body>
+</html>
