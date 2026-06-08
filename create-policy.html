@@ -779,6 +779,107 @@
 
     </div><!-- /app kill section -->
 
+    <!-- User Consent Notification section -->
+    <div class="settings-section">
+      <h4>User Consent Notification</h4>
+
+      <!-- Master toggle -->
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Show consent notification on first logon</div>
+          <div class="setting-desc">Display a notification to the user at the start of their first logon of the day, informing them of scheduled patch activity and asking for their consent.</div>
+        </div>
+        <div class="setting-control">
+          <label class="toggle">
+            <input type="checkbox" id="notif-toggle" checked onchange="toggleNotifSection(this)" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Configurable sub-rows -->
+      <div id="notif-config-rows">
+
+        <!-- Notification header -->
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Notification header</div>
+            <div class="setting-desc">Title shown at the top of the end-user notification window.</div>
+          </div>
+          <div class="setting-control" style="flex:1; max-width:360px; margin-left:24px;">
+            <input type="text" id="notif-header-input" value="Patch Deployment Scheduled for Today"
+              style="width:100%; border:1px solid #cdd1d8; border-radius:4px; padding:7px 10px; font-size:13px; color:#333; outline:none;"
+              onfocus="this.style.borderColor='#0073e6'" onblur="this.style.borderColor='#cdd1d8'" />
+          </div>
+        </div>
+
+        <!-- Notification body -->
+        <div class="setting-row" style="align-items:flex-start;">
+          <div style="padding-top:4px;">
+            <div class="setting-label">Notification body</div>
+            <div class="setting-desc">Message body shown below the header. Patch list, app-kill details, and reboot notice are always appended automatically.</div>
+          </div>
+          <div class="setting-control" style="flex:1; max-width:360px; margin-left:24px;">
+            <textarea id="notif-body-input" rows="3"
+              style="width:100%; border:1px solid #cdd1d8; border-radius:4px; padding:7px 10px; font-size:13px; color:#333; outline:none; resize:vertical; line-height:1.5;"
+              onfocus="this.style.borderColor='#0073e6'" onblur="this.style.borderColor='#cdd1d8'">Your IT team has scheduled patches for installation during your idle time today. The following updates will be applied automatically.</textarea>
+          </div>
+        </div>
+
+        <!-- Skip window -->
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Allow user to skip for</div>
+            <div class="setting-desc">If the user chooses to skip, they can defer the notification for this many days before it reappears.</div>
+          </div>
+          <div class="setting-control" style="gap:8px;">
+            <input type="number" id="skip-days" value="2" min="1" max="30"
+              style="width:60px; border:1px solid #cdd1d8; border-radius:4px; padding:6px 10px; font-size:13px; font-weight:600; color:#333; text-align:center; outline:none;"
+              onfocus="this.style.borderColor='#0073e6'" onblur="this.style.borderColor='#cdd1d8'"
+              oninput="syncDeadlineLabel()" />
+            <span class="unit-label">days</span>
+          </div>
+        </div>
+
+        <!-- Compliance deadline — read-only, derived from force-days -->
+        <div class="setting-row" style="background:#f7f9fc; border:1px solid #e4e8ef; border-radius:6px; padding:12px 14px; margin-top:4px;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <span style="font-size:16px; flex-shrink:0;">ℹ️</span>
+            <div style="font-size:12.5px; color:#3d5a7a; line-height:1.6;">
+              Based on your <strong>Force deployment after</strong> setting, users will see a compliance warning in the notification:
+              <br/><em id="deadline-label" style="color:#0051a3;">"Deployment will be forced after <strong id="deadline-days">7</strong> days if skipped."</em>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /notif-config-rows -->
+    </div><!-- /user consent section -->
+
+    <!-- End User Notification preview section -->
+    <div style="
+      background: linear-gradient(135deg, #1c2340 0%, #0d1b2e 100%);
+      border-radius: 8px; padding: 22px 24px; margin-bottom: 4px;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    ">
+      <div>
+        <div style="font-size:13px; font-weight:700; color:#e0e8ff; margin-bottom:4px;">
+          ✦ End User Notification — Preview
+        </div>
+        <div style="font-size:12px; color:#8d96b0; line-height:1.5;">
+          See how the first-logon consent notification will appear on the user's machine. Opens in a new tab.
+        </div>
+      </div>
+      <a href="user-notification.html" target="_blank" style="
+        display: inline-flex; align-items: center; gap: 7px;
+        background: #0073e6; color: #fff; border: none; border-radius: 4px;
+        padding: 9px 18px; font-size: 12.5px; font-weight: 600;
+        text-decoration: none; white-space: nowrap; flex-shrink: 0;
+        transition: background .15s;
+      " onmouseover="this.style.background='#005bb5'" onmouseout="this.style.background='#0073e6'">
+        Preview notification →
+      </a>
+    </div>
+
   </div><!-- /auto-panel -->
 
   <!-- ══ LEGACY PANEL ══ -->
@@ -976,6 +1077,20 @@
     row.style.pointerEvents = cb.checked ? 'auto' : 'none';
   }
 
+  function toggleNotifSection(cb) {
+    const rows = document.getElementById('notif-config-rows');
+    rows.style.opacity      = cb.checked ? '1' : '0.4';
+    rows.style.pointerEvents = cb.checked ? 'auto' : 'none';
+  }
+
+  function syncDeadlineLabel() {
+    const forceDays = document.getElementById('force-days');
+    const deadlineDays = document.getElementById('deadline-days');
+    if (forceDays && deadlineDays) {
+      deadlineDays.textContent = forceDays.value || '7';
+    }
+  }
+
   function toggleForceRow(radio) {
     const row = document.getElementById('force-deploy-row');
     if (radio.value === 'yes') {
@@ -1020,6 +1135,12 @@
 
   // init
   renderProcessTags();
+  // sync force-days → deadline label live
+  const forceDaysInput = document.getElementById('force-days');
+  if (forceDaysInput) {
+    forceDaysInput.addEventListener('input', syncDeadlineLabel);
+    syncDeadlineLabel();
+  }
 
   function savePolicy() {
     const name = document.getElementById('policy-name-input').value.trim();
