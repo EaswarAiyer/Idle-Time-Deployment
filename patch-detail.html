@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endpoint Central – InstallWindowsPatch4287</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px; color: #333;
+      background: #f0f2f5;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+
+    /* ── Top nav ── */
+    .topnav {
+      display: flex; align-items: center;
+      background: #fff; border-bottom: 1px solid #dde1e7;
+      height: 46px; padding: 0 14px; gap: 0; flex-shrink: 0; z-index: 100;
+    }
+    .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:15px; color:#1a1a2e; margin-right:18px; }
+    .logo-icon { width:32px; height:32px; background:conic-gradient(#e55,#f80,#ff0,#0c0,#08f,#80f,#e55); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; font-size:13px; }
+    .topnav-links { display:flex; align-items:stretch; height:100%; }
+    .topnav-links a { display:flex; align-items:center; padding:0 12px; text-decoration:none; color:#444; font-size:12.5px; border-bottom:2px solid transparent; white-space:nowrap; }
+    .topnav-links a.active { color:#0073e6; border-bottom-color:#0073e6; font-weight:600; }
+    .topnav-more { padding:0 10px; color:#777; font-size:16px; cursor:pointer; display:flex; align-items:center; }
+    .topnav-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+    .btn-trial { background:linear-gradient(135deg,#ff6b35,#f7931e); color:#fff; border:none; border-radius:4px; padding:6px 13px; font-size:12px; font-weight:600; cursor:pointer; }
+    .btn-sdp { display:flex; align-items:center; gap:5px; background:#fff; border:1px solid #cdd1d8; border-radius:4px; padding:5px 10px; font-size:12px; font-weight:600; color:#333; cursor:pointer; }
+    .btn-sdp .sdp-dot { width:8px; height:8px; background:#0073e6; border-radius:50%; }
+    .topnav-icon { color:#666; font-size:16px; cursor:pointer; padding:4px; }
+    .avatar { width:28px; height:28px; background:#b0b8c4; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; font-weight:700; }
+
+    /* ── Body layout ── */
+    .body-wrap { display:flex; flex:1; overflow:hidden; }
+
+    /* ── Icon sidebar ── */
+    .icon-sidebar { width:56px; background:#1c2340; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:4px; flex-shrink:0; }
+    .icon-sidebar .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; width:100%; padding:9px 4px; cursor:pointer; color:#8d96b0; font-size:10px; text-align:center; border-left:3px solid transparent; }
+    .icon-sidebar .nav-item:hover { color:#c5cbe0; background:#252d4a; }
+    .icon-sidebar .nav-item.active { color:#4da6ff; background:#252d4a; border-left-color:#4da6ff; }
+    .icon-sidebar .nav-item svg { width:20px; height:20px; }
+    .icon-sidebar .nav-item span { font-size:9.5px; }
+    .icon-sidebar .spacer { flex:1; }
+
+    /* ── Left panel ── */
+    .left-panel { width:220px; background:#fff; border-right:1px solid #dde1e7; overflow-y:auto; flex-shrink:0; padding-bottom:20px; }
+    .left-panel .section-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px 8px; font-size:12px; font-weight:700; color:#333; cursor:pointer; }
+    .left-panel .nav-link { display:block; padding:7px 14px 7px 22px; font-size:12.5px; color:#444; text-decoration:none; border-left:3px solid transparent; cursor:pointer; }
+    .left-panel .nav-link:hover { background:#f4f6fa; color:#0073e6; }
+    .left-panel .nav-link.active { background:#eaf3ff; color:#0073e6; font-weight:600; border-left-color:#0073e6; }
+    .collapse-handle { width:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#bbb; font-size:14px; }
+
+    /* ── Main content ── */
+    .main-content { flex:1; overflow-y:auto; background:#f0f2f5; display:flex; flex-direction:column; }
+
+    /* Breadcrumb */
+    .breadcrumb { padding:12px 22px 0; font-size:12px; color:#666; display:flex; align-items:center; gap:5px; }
+    .breadcrumb a { color:#0073e6; text-decoration:none; }
+    .breadcrumb a:hover { text-decoration:underline; }
+    .breadcrumb .sep { color:#bbb; }
+
+    /* Page header */
+    .page-header { padding:8px 22px 0; display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:17px; font-weight:700; color:#1a1a2e; }
+    .page-header-actions { display:flex; gap:6px; }
+    .icon-btn { width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:1px solid #dde1e7; border-radius:4px; background:#fff; cursor:pointer; color:#666; font-size:15px; }
+    .icon-btn:hover { background:#f4f6fa; }
+
+    /* Action bar */
+    .action-bar { padding:10px 22px; display:flex; align-items:center; gap:8px; }
+    .action-btn-bar {
+      display:flex; align-items:center; gap:5px;
+      border:1px solid #cdd1d8; border-radius:4px; padding:6px 12px;
+      background:#fff; font-size:12.5px; color:#333; cursor:pointer;
+      font-weight:500; transition:all .15s;
+    }
+    .action-btn-bar:hover { background:#f4f6fa; border-color:#aaa; }
+    .action-btn-bar .caret { font-size:11px; color:#888; }
+    .nav-arrows { margin-left:auto; display:flex; gap:4px; }
+    .nav-arrow { width:26px; height:26px; border:1px solid #dde1e7; border-radius:4px; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#666; font-size:13px; }
+    .nav-arrow:hover { background:#f4f6fa; }
+
+    /* Content card */
+    .content-card { margin:0 22px 22px; background:#fff; border:1px solid #dde1e7; border-radius:8px; overflow:hidden; flex:1; }
+
+    /* Tabs */
+    .tabs { display:flex; border-bottom:2px solid #e4e8ef; padding:0 16px; }
+    .tab { padding:11px 16px; font-size:13px; cursor:pointer; color:#666; border-bottom:2px solid transparent; margin-bottom:-2px; font-weight:500; white-space:nowrap; }
+    .tab:hover { color:#0073e6; }
+    .tab.active { color:#0073e6; border-bottom-color:#0073e6; font-weight:600; }
+
+    /* Info banner */
+    .info-banner {
+      display:flex; align-items:center; gap:10px;
+      margin:14px 16px 0;
+      background:#fff8f0; border:1px solid #fcd9a8; border-radius:6px;
+      padding:10px 14px; font-size:12.5px; color:#7a4b00;
+    }
+    .info-banner .close-btn { margin-left:auto; color:#0073e6; font-size:12px; cursor:pointer; font-weight:500; white-space:nowrap; }
+    .info-banner .close-btn:hover { text-decoration:underline; }
+
+    /* Toolbar */
+    .table-toolbar {
+      display:flex; align-items:center; gap:12px;
+      padding:12px 16px; border-bottom:1px solid #eaecf0;
+    }
+    .view-toggle { display:flex; align-items:center; gap:14px; }
+    .radio-opt { display:flex; align-items:center; gap:5px; cursor:pointer; font-size:13px; color:#333; }
+    .radio-opt input[type=radio] { accent-color:#0073e6; }
+    .filter-divider { width:1px; height:20px; background:#dde1e7; }
+    .filter-label { font-size:12.5px; color:#555; font-weight:500; }
+    .filter-select {
+      display:flex; align-items:center; gap:5px;
+      border:1px solid #cdd1d8; border-radius:4px; padding:5px 10px;
+      font-size:12.5px; color:#333; cursor:pointer; background:#fff;
+      min-width:170px; justify-content:space-between;
+    }
+    .filter-select .caret { font-size:10px; color:#888; }
+    .status-filter-select {
+      display:flex; align-items:center; gap:5px;
+      border:1px solid #cdd1d8; border-radius:4px; padding:5px 10px;
+      font-size:12.5px; color:#333; cursor:pointer; background:#fff;
+      min-width:120px; justify-content:space-between;
+    }
+    .table-toolbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+    .total-records { font-size:12px; font-weight:600; color:#333; }
+    .toolbar-icon { color:#888; font-size:14px; cursor:pointer; padding:3px; }
+
+    /* Table */
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; }
+    thead tr { background:#f4f6fa; border-bottom:1px solid #dde1e7; }
+    thead th { padding:9px 14px; text-align:left; font-size:12px; font-weight:700; color:#444; white-space:nowrap; }
+    thead th.sortable { cursor:pointer; }
+    thead th.sortable:hover { color:#0073e6; }
+    tbody tr { border-bottom:1px solid #eaecf0; transition:background .12s; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:#f7f9fc; }
+    td { padding:11px 14px; font-size:12.5px; color:#444; vertical-align:middle; }
+
+    /* Status chips */
+    .status-chip {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:600;
+      white-space:nowrap;
+    }
+    .status-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+
+    .status-installed     { background:#d1fae5; color:#065f46; }
+    .status-installed     .status-dot { background:#059669; }
+
+    .status-retry         { background:#fff3cd; color:#7a4b00; }
+    .status-retry         .status-dot { background:#f59e0b; animation: pulse 1.4s infinite; }
+
+    .status-pending       { background:#e0f2fe; color:#0c4a6e; }
+    .status-pending       .status-dot { background:#0284c7; }
+
+    .status-failed        { background:#fee2e2; color:#7f1d1d; }
+    .status-failed        .status-dot { background:#dc2626; }
+
+    .status-inprogress    { background:#ede9fe; color:#4c1d95; }
+    .status-inprogress    .status-dot { background:#7c3aed; animation: pulse 1.4s infinite; }
+
+    .status-reboot        { background:#fef3c7; color:#78350f; }
+    .status-reboot        .status-dot { background:#d97706; }
+
+    @keyframes pulse {
+      0%, 100% { opacity:1; }
+      50%       { opacity:.3; }
+    }
+
+    /* Remarks cell */
+    .remarks-cell { max-width:380px; }
+    .idle-tag {
+      display:inline-flex; align-items:center; gap:4px;
+      background: linear-gradient(135deg,#ede9fe,#dbeafe);
+      color:#4c1d95; font-size:11px; font-weight:600;
+      padding:2px 8px; border-radius:10px; margin-left:6px;
+      white-space:nowrap;
+    }
+
+    /* Pagination */
+    .pagination { display:flex; align-items:center; justify-content:flex-end; gap:6px; padding:10px 14px; border-top:1px solid #eaecf0; }
+    .page-info { font-size:12px; color:#777; }
+    .page-btn { min-width:26px; height:24px; border:1px solid #dde1e7; border-radius:4px; background:#fff; color:#555; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0 6px; }
+    .page-btn:hover { background:#eaf3ff; border-color:#0073e6; color:#0073e6; }
+    .per-page { border:1px solid #cdd1d8; border-radius:4px; padding:3px 6px; font-size:11.5px; color:#555; outline:none; }
+  </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-icon">e</div>
+    Endpoint Central
+  </div>
+  <div class="topnav-links">
+    <a href="#">Home</a>
+    <a href="#">Configurations</a>
+    <a href="#">Threats &amp; Patches</a>
+    <a href="#" class="active">Software Deployment</a>
+    <a href="#">Inventory</a>
+    <a href="#">Agent</a>
+  </div>
+  <span class="topnav-more">•••</span>
+  <div class="topnav-right">
+    <button class="btn-trial">Start your 30 days free trial</button>
+    <button class="btn-sdp"><span class="sdp-dot"></span> Jump to SDP</button>
+    <span class="topnav-icon">🔍</span>
+    <span class="topnav-icon">🔔</span>
+    <span class="topnav-icon">⚡</span>
+    <div class="avatar">U</div>
+    <span style="font-size:18px;color:#555;cursor:pointer;">⠿</span>
+  </div>
+</nav>
+
+<div class="body-wrap">
+
+  <!-- Icon Sidebar -->
+  <div class="icon-sidebar">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Threats</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span>Patches</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1" fill="currentColor"/></svg>
+      <span>Systems</span>
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Deployment</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>Compliance</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Reports</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <span>Settings</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.18-4.5"/></svg>
+      <span>Update Now</span>
+    </div>
+  </div>
+
+  <!-- Left Panel -->
+  <div class="left-panel">
+    <div class="section-header">▾ Deployment</div>
+    <a class="nav-link active">Manual Deployment</a>
+    <a class="nav-link">Test and Approve</a>
+    <a class="nav-link">Automate Patch Deployment</a>
+    <a class="nav-link">Disable Automatic Updates</a>
+    <a class="nav-link">Security Configurations</a>
+    <a class="nav-link">Software Uninstallation</a>
+    <a class="nav-link" href="deployment-policies.html">Deployment Policies</a>
+    <a class="nav-link">Script Repository</a>
+    <a class="nav-link">Trash</a>
+    <div class="section-header" style="margin-top:8px;">▾ Tools</div>
+    <a class="nav-link">Remote Shutdown</a>
+    <a class="nav-link">Wake on LAN</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="#">Deployment</a>
+      <span class="sep">›</span>
+      <a href="#">Patch Configuration</a>
+      <span class="sep">›</span>
+      <span>InstallWindowsPatch4287</span>
+    </div>
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-title">InstallWindowsPatch4287</div>
+      <div class="page-header-actions">
+        <div class="icon-btn" title="Share">⬆</div>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <button class="action-btn-bar">Modify <span class="caret">▾</span></button>
+      <button class="action-btn-bar">Resume</button>
+      <button class="action-btn-bar">Move to Trash</button>
+      <button class="action-btn-bar">Save as Template</button>
+      <button class="action-btn-bar">Save As New <span class="caret">▾</span></button>
+      <div class="nav-arrows">
+        <div class="nav-arrow">&#8249;</div>
+        <div class="nav-arrow">&#8250;</div>
+      </div>
+    </div>
+
+    <!-- Content card -->
+    <div class="content-card">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab" onclick="switchTab(this)">Summary</div>
+        <div class="tab" onclick="switchTab(this)">Configuration Details</div>
+        <div class="tab active" onclick="switchTab(this)">Execution Status</div>
+        <div class="tab" onclick="switchTab(this)">Download Pending</div>
+        <div class="tab" onclick="switchTab(this)">Replication Details</div>
+      </div>
+
+      <!-- Info banner -->
+      <div class="info-banner" id="info-banner">
+        <span style="font-size:15px;">🟠</span>
+        Mac/Linux computers are excluded from this list.
+        <span class="close-btn" onclick="document.getElementById('info-banner').style.display='none'">Close</span>
+      </div>
+
+      <!-- Table toolbar -->
+      <div class="table-toolbar">
+        <div class="view-toggle">
+          <label class="radio-opt">
+            <input type="radio" name="view" checked /> Computer View
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="view" /> Detail View
+          </label>
+        </div>
+        <div class="filter-divider"></div>
+        <span class="filter-label">Filter By :</span>
+        <div class="filter-select">
+          <span>Domain/Remote Offi...</span>
+          <span class="caret">▾</span>
+        </div>
+        <div class="status-filter-select">
+          <span>Status</span>
+          <span class="caret">▾</span>
+        </div>
+        <div class="table-toolbar-right">
+          <span class="total-records">Total Records | <strong id="total-count">6</strong></span>
+          <span class="toolbar-icon">🔍</span>
+          <span class="toolbar-icon">⬜</span>
+          <span class="toolbar-icon">⬆</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable">Computer Name &nbsp;↑</th>
+              <th>Domain Name</th>
+              <th>Remote Office</th>
+              <th>Status</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="exec-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <span class="page-info">Rows per page:</span>
+        <select class="per-page"><option>75</option><option>25</option><option>50</option></select>
+        <span class="page-info" style="margin-left:8px;">1 – 6 of Total Records</span>
+        <button class="page-btn">&#8249;</button>
+        <button class="page-btn">&#8250;</button>
+      </div>
+
+    </div><!-- /content-card -->
+  </div><!-- /main-content -->
+</div><!-- /body-wrap -->
+
+<script>
+  const COMPUTERS = [
+    {
+      name: "WKSTN-HR-042",
+      domain: "corp.acme.com",
+      office: "HQ – New York",
+      statusKey: "retry",
+      statusLabel: "Retry in Progress",
+      remarks: "Application currently running, patching scheduled at the next idle time",
+      idleTime: "2:30 PM",
+      highlight: true
+    },
+    {
+      name: "WKSTN-DEV-117",
+      domain: "corp.acme.com",
+      office: "HQ – New York",
+      statusKey: "installed",
+      statusLabel: "Installed",
+      remarks: "Awaiting system reboot, scheduled at the next idle time",
+      idleTime: "2:30 PM",
+      highlight: true,
+      rebootPending: true
+    },
+    {
+      name: "WKSTN-FIN-008",
+      domain: "corp.acme.com",
+      office: "Branch – Chicago",
+      statusKey: "installed",
+      statusLabel: "Installed",
+      remarks: "Patch installed successfully. No reboot required.",
+      idleTime: null
+    },
+    {
+      name: "LAPTOP-MKT-031",
+      domain: "corp.acme.com",
+      office: "Branch – Chicago",
+      statusKey: "inprogress",
+      statusLabel: "Installation in Progress",
+      remarks: "Patch binaries downloaded, installation initiated.",
+      idleTime: null
+    },
+    {
+      name: "WKSTN-OPS-055",
+      domain: "remote.acme.com",
+      office: "Remote – Austin",
+      statusKey: "pending",
+      statusLabel: "Yet to Start",
+      remarks: "Waiting for the next agent refresh cycle.",
+      idleTime: null
+    },
+    {
+      name: "WKSTN-IT-022",
+      domain: "remote.acme.com",
+      office: "Remote – Austin",
+      statusKey: "failed",
+      statusLabel: "Failed",
+      remarks: "Installation failed: insufficient disk space (required 450 MB, available 120 MB).",
+      idleTime: null
+    }
+  ];
+
+  function renderTable() {
+    const tbody = document.getElementById('exec-tbody');
+    tbody.innerHTML = '';
+    COMPUTERS.forEach(c => {
+      const tr = document.createElement('tr');
+      if (c.highlight) tr.style.background = 'linear-gradient(90deg,#f5f0ff 0%,#eef5ff 100%)';
+
+      // Status chip class
+      const chipClass = {
+        retry:      'status-retry',
+        installed:  c.rebootPending ? 'status-reboot' : 'status-installed',
+        inprogress: 'status-inprogress',
+        pending:    'status-pending',
+        failed:     'status-failed'
+      }[c.statusKey];
+
+      const statusLabel = c.rebootPending ? 'Installed — Reboot Pending' : c.statusLabel;
+
+      // Remarks with idle time tag if present
+      const remarksHtml = c.idleTime
+        ? `${c.remarks} <span class="idle-tag">🕐 ${c.idleTime}</span>`
+        : c.remarks;
+
+      tr.innerHTML = `
+        <td style="font-weight:600;color:#1a1a2e;">${c.name}</td>
+        <td style="color:#666;">${c.domain}</td>
+        <td style="color:#666;">${c.office}</td>
+        <td><span class="status-chip ${chipClass}"><span class="status-dot"></span>${statusLabel}</span></td>
+        <td class="remarks-cell">${remarksHtml}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function switchTab(el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  renderTable();
+</script>
+</body>
+</html>
