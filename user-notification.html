@@ -285,7 +285,7 @@
 
       <!-- Patch summary bar -->
       <div class="patch-summary-bar">
-        <span class="summary-chip high"><span class="summary-dot"></span>2 High-Impact patches</span>
+        <span class="summary-chip high"><span class="summary-dot"></span>2 App Restart Required patches</span>
         <span class="summary-chip reboot"><span class="summary-dot"></span>Reboot planned</span>
         <button class="details-toggle" id="details-toggle-btn" onclick="toggleDetails()">
           Show details <span id="details-caret">▾</span>
@@ -295,14 +295,14 @@
       <!-- Expandable section -->
       <div class="patch-detail-section" id="patch-detail-section">
 
-        <!-- High-Impact patches only -->
+        <!-- App Restart Required patches only -->
         <div class="patch-list">
-          <div class="patch-list-header">High-Impact Patches</div>
+          <div class="patch-list-header">App Restart Required Patches</div>
 
           <div class="patch-row" onclick="togglePatchExpand(this)">
             <span class="patch-kb">KB5031364</span>
             <span class="patch-name">Windows 11 Cumulative Update</span>
-            <span class="patch-chip high-impact">⚠ High-Impact</span>
+            <span class="patch-chip high-impact">↺ App Restart Required</span>
           </div>
           <div class="patch-expand-row">
             <strong>Cumulative update</strong> — Includes quality improvements and security patches for Windows 11 23H2. <strong>System reboot required</strong> after installation.
@@ -311,7 +311,7 @@
           <div class="patch-row" onclick="togglePatchExpand(this)">
             <span class="patch-kb">Adobe-2024.1</span>
             <span class="patch-name">Adobe Acrobat Security Patch</span>
-            <span class="patch-chip high-impact">⚠ High-Impact</span>
+            <span class="patch-chip high-impact">↺ App Restart Required</span>
           </div>
           <div class="patch-expand-row">
             <strong>CVE-2024-20735</strong> — Critical out-of-bounds write vulnerability in Adobe Acrobat. <strong>Acrobat will be closed</strong> during installation.
