@@ -268,7 +268,7 @@
     <div class="state-overlay overlay-skip" id="overlay-skip">
       <div class="overlay-icon">⏭️</div>
       <div class="overlay-title" id="overlay-skip-title">Deployment deferred</div>
-      <div class="overlay-sub" id="overlay-skip-sub">You can skip for now. Your IT policy requires installation within 7 days.</div>
+      <div class="overlay-sub" id="overlay-skip-sub">You'll be reminded again on your next logon.</div>
     </div>
 
     <!-- Header -->
@@ -285,8 +285,7 @@
 
       <!-- Patch summary bar -->
       <div class="patch-summary-bar">
-        <span class="summary-chip total"><span class="summary-dot"></span>4 patches</span>
-        <span class="summary-chip high"><span class="summary-dot"></span>2 High-Impact</span>
+        <span class="summary-chip high"><span class="summary-dot"></span>2 High-Impact patches</span>
         <span class="summary-chip reboot"><span class="summary-dot"></span>Reboot planned</span>
         <button class="details-toggle" id="details-toggle-btn" onclick="toggleDetails()">
           Show details <span id="details-caret">▾</span>
@@ -296,27 +295,9 @@
       <!-- Expandable section -->
       <div class="patch-detail-section" id="patch-detail-section">
 
-        <!-- Patch list -->
+        <!-- High-Impact patches only -->
         <div class="patch-list">
-          <div class="patch-list-header">Scheduled Patches</div>
-
-          <div class="patch-row" onclick="togglePatchExpand(this)">
-            <span class="patch-kb">KB5034441</span>
-            <span class="patch-name">Windows Security Update</span>
-            <span class="patch-chip non-impact">● Non-Impact</span>
-          </div>
-          <div class="patch-expand-row">
-            <strong>CVE-2024-21302</strong> — Critical security update addressing elevation of privilege vulnerability in Windows kernel. <strong>No reboot required.</strong>
-          </div>
-
-          <div class="patch-row" onclick="togglePatchExpand(this)">
-            <span class="patch-kb">KB5032189</span>
-            <span class="patch-name">.NET Runtime 8.0.1</span>
-            <span class="patch-chip non-impact">● Non-Impact</span>
-          </div>
-          <div class="patch-expand-row">
-            <strong>Runtime update</strong> — Cumulative update for .NET 8 addressing stability and security improvements. Background install, <strong>no reboot required.</strong>
-          </div>
+          <div class="patch-list-header">High-Impact Patches</div>
 
           <div class="patch-row" onclick="togglePatchExpand(this)">
             <span class="patch-kb">KB5031364</span>
@@ -359,14 +340,6 @@
         </div>
       </div>
 
-      <!-- Compliance deadline banner -->
-      <div class="deadline-banner">
-        <span style="font-size:16px; flex-shrink:0;">⚠️</span>
-        <div>
-          Your IT policy requires all patches to be installed within <strong>7 days</strong>. If you skip too many times, deployment will be <strong>forced automatically</strong> — even during active use.
-        </div>
-      </div>
-
     </div><!-- /modal-body -->
 
     <!-- Action buttons -->
@@ -374,10 +347,7 @@
       <button class="btn-confirm" onclick="doConfirm()">
         ✓ &nbsp; Confirm &amp; Allow Deployment
       </button>
-      <button class="btn-skip-days" onclick="doSkipDays()">
-        Skip for&nbsp;<span id="skip-days-label">2</span>&nbsp;days
-      </button>
-      <button class="btn-skip-today" onclick="doSkipToday()">Skip for today only</button>
+      <button class="btn-skip-days" onclick="doSkipToday()">Skip for the day</button>
     </div>
 
     <!-- Footer -->
