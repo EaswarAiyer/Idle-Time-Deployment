@@ -165,15 +165,70 @@
       font-size: 12.5px; color: #7a4b00; line-height: 1.5;
     }
 
-    /* Compliance deadline banner */
-    .deadline-banner {
-      display: flex; align-items: flex-start; gap: 10px;
-      background: linear-gradient(135deg, #fff3cd, #ffeeba);
-      border: 1px solid #f5c842; border-radius: 8px;
-      padding: 11px 14px; margin-bottom: 16px;
-      font-size: 12.5px; color: #7a4b00; line-height: 1.5;
+    /* Schedule row */
+    .schedule-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; margin-bottom: 14px;
+      background: linear-gradient(135deg, #eaf4ff, #f0f7ff);
+      border: 1px solid #c7dff7; border-radius: 8px;
+      gap: 12px;
     }
-    .deadline-banner strong { color: #5c3200; }
+    .schedule-time-info { display: flex; align-items: center; gap: 8px; }
+    .schedule-time-info .clock-icon { font-size: 16px; flex-shrink: 0; }
+    .schedule-time-label { font-size: 12.5px; color: #1a1a2e; }
+    .schedule-time-label strong { color: #0051a3; }
+    .btn-reschedule {
+      display: flex; align-items: center; gap: 5px;
+      background: #fff; border: 1px solid #0073e6; color: #0073e6;
+      border-radius: 4px; padding: 5px 12px; font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background .15s;
+    }
+    .btn-reschedule:hover { background: #eaf3ff; }
+
+    /* Custom time picker panel */
+    .time-picker-panel {
+      max-height: 0; overflow: hidden; opacity: 0;
+      transition: max-height .25s ease, opacity .2s ease;
+      margin-bottom: 0;
+    }
+    .time-picker-panel.open { max-height: 120px; opacity: 1; margin-bottom: 14px; }
+    .time-picker-inner {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 12px 14px;
+      background: #f7f9fc; border: 1px solid #dde1e7; border-radius: 8px;
+    }
+    .time-picker-inner label { font-size: 12px; font-weight: 600; color: #555; }
+    .time-input-field {
+      border: 1px solid #cdd1d8; border-radius: 4px; padding: 6px 10px;
+      font-size: 13px; font-weight: 600; color: #333; outline: none; width: 100px;
+    }
+    .time-input-field:focus { border-color: #0073e6; }
+    .btn-set-time {
+      background: #0073e6; color: #fff; border: none; border-radius: 4px;
+      padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-set-time:hover { background: #005bb5; }
+    .btn-cancel-time {
+      background: none; border: none; color: #888; font-size: 12px;
+      cursor: pointer; text-decoration: underline; padding: 0;
+    }
+
+    /* Reminder preference row */
+    .reminder-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; margin-bottom: 14px;
+      background: #f7f9fc; border: 1px solid #e4e8ef; border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    .reminder-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12.5px; color: #333; }
+    .reminder-row input[type=checkbox] { accent-color: #0073e6; width: 14px; height: 14px; cursor: pointer; }
+    .reminder-select {
+      border: 1px solid #cdd1d8; border-radius: 4px; padding: 4px 8px;
+      font-size: 12.5px; color: #333; outline: none; background: #fff;
+    }
+    .reminder-select:focus { border-color: #0073e6; }
 
     /* Action buttons */
     .modal-actions {
@@ -340,6 +395,45 @@
         </div>
       </div>
 
+      <!-- Scheduled deployment time -->
+      <div class="schedule-row">
+        <div class="schedule-time-info">
+          <span class="clock-icon">🕐</span>
+          <div class="schedule-time-label">
+            Deployment planned at <strong id="planned-time">2:30 PM</strong> today
+            <span style="font-size:11px; color:#5d87b0; margin-left:4px;">(next idle window)</span>
+          </div>
+        </div>
+        <button class="btn-reschedule" onclick="toggleTimePicker()">
+          <span>📅</span> Schedule a different time
+        </button>
+      </div>
+
+      <!-- Custom time picker (collapsed by default) -->
+      <div class="time-picker-panel" id="time-picker-panel">
+        <div class="time-picker-inner">
+          <label>Deploy at:</label>
+          <input type="time" id="custom-time" class="time-input-field" value="14:30" />
+          <button class="btn-set-time" onclick="setCustomTime()">Confirm time</button>
+          <button class="btn-cancel-time" onclick="toggleTimePicker()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Reminder preference -->
+      <div class="reminder-row">
+        <label>
+          <input type="checkbox" id="remind-toggle" checked />
+          Remind me
+        </label>
+        <select class="reminder-select" id="remind-mins">
+          <option value="5" selected>5 minutes</option>
+          <option value="10">10 minutes</option>
+          <option value="15">15 minutes</option>
+          <option value="30">30 minutes</option>
+        </select>
+        <span style="font-size:12.5px; color:#555;">before deployment starts</span>
+      </div>
+
     </div><!-- /modal-body -->
 
     <!-- Action buttons -->
@@ -376,6 +470,25 @@
 
   // Pull header/body from create-policy if opened via opener (for demo)
   // Falls back to defaults already set in HTML
+
+  // Time picker toggle
+  let timePickerOpen = false;
+  function toggleTimePicker() {
+    timePickerOpen = !timePickerOpen;
+    document.getElementById('time-picker-panel').classList.toggle('open', timePickerOpen);
+  }
+
+  function setCustomTime() {
+    const val = document.getElementById('custom-time').value; // "HH:MM"
+    if (!val) return;
+    const [h, m] = val.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12  = h % 12 || 12;
+    const label = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+    document.getElementById('planned-time').textContent = label;
+    timePickerOpen = false;
+    document.getElementById('time-picker-panel').classList.remove('open');
+  }
 
   // Details toggle
   let detailsOpen = false;
