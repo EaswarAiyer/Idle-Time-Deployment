@@ -859,25 +859,45 @@
     <div style="
       background: linear-gradient(135deg, #1c2340 0%, #0d1b2e 100%);
       border-radius: 8px; padding: 22px 24px; margin-bottom: 4px;
-      display: flex; align-items: center; justify-content: space-between; gap: 20px;
     ">
-      <div>
+      <div style="margin-bottom: 16px;">
         <div style="font-size:13px; font-weight:700; color:#e0e8ff; margin-bottom:4px;">
           ✦ End User Notification — Preview
         </div>
         <div style="font-size:12px; color:#8d96b0; line-height:1.5;">
-          See how the first-logon consent notification will appear on the user's machine. Opens in a new tab.
+          Preview how notifications appear on the user's machine at each stage. Opens in a new tab.
         </div>
       </div>
-      <a href="user-notification.html" target="_blank" style="
-        display: inline-flex; align-items: center; gap: 7px;
-        background: #0073e6; color: #fff; border: none; border-radius: 4px;
-        padding: 9px 18px; font-size: 12.5px; font-weight: 600;
-        text-decoration: none; white-space: nowrap; flex-shrink: 0;
-        transition: background .15s;
-      " onmouseover="this.style.background='#005bb5'" onmouseout="this.style.background='#0073e6'">
-        Preview notification →
-      </a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <!-- First-logon notification -->
+        <a href="user-notification.html" target="_blank" style="
+          display: inline-flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;
+          background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+          border-radius: 6px; padding: 12px 16px; text-decoration: none;
+          transition: background .15s;
+        " onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">
+          <span style="font-size:20px;">🌅</span>
+          <div>
+            <div style="font-size:12.5px; font-weight:600; color:#e0e8ff;">First-logon notification</div>
+            <div style="font-size:11px; color:#8d96b0; margin-top:2px;">Consent, schedule & reminder preference</div>
+          </div>
+          <span style="margin-left:auto; color:#4da6ff; font-size:13px;">→</span>
+        </a>
+        <!-- Reminder notification -->
+        <a href="reminder-notification.html" target="_blank" style="
+          display: inline-flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;
+          background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+          border-radius: 6px; padding: 12px 16px; text-decoration: none;
+          transition: background .15s;
+        " onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">
+          <span style="font-size:20px;">🔔</span>
+          <div>
+            <div style="font-size:12.5px; font-weight:600; color:#e0e8ff;">Reminder notification</div>
+            <div style="font-size:11px; color:#8d96b0; margin-top:2px;">X mins before deployment — live countdown</div>
+          </div>
+          <span style="margin-left:auto; color:#4da6ff; font-size:13px;">→</span>
+        </a>
+      </div>
     </div>
 
   </div><!-- /auto-panel -->
